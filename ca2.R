@@ -1,6 +1,6 @@
 
 #here we are importing data from csv
-df_NIPostcodes=read.csv("NIPostcodes.csv", header = 0)
+df_NIPostcodes = read.csv("NIPostcodes.csv", header = 0)
 
 #here we are showing total no. of row 
 nrow(df_NIPostcodes)
@@ -167,6 +167,9 @@ random_crime_samples <- sample_n(AllNICrimeData_dataframe_new, 1000)
 head(random_crime_samples)
 str(random_crime_sample)
 
+
+
+head(random_crime_samples)
 
 
 
