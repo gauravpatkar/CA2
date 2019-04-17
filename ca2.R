@@ -155,21 +155,94 @@ head(AllNICrimeData_dataframe)
 
 str(AllNICrimeData_dataframe)
 
-#datafile_summary <- group_by(AllNICrimeData_dataframe, Location)
 
-#colSums(is.na(AllNICrimeData_dataframe["Location"]))
-#random_crime_samples <- sample_n(AllNICrimeData_dataframe, 1000)
-#sum([])
+
+# 5) Fetching 1000 random records from Crime data and applying a function that will
+# extract postcodes by matching location.
 
 sum(AllNICrimeData_dataframe[AllNICrimeData_dataframe$Location] == "No Location")
+
 AllNICrimeData_dataframe_new <- AllNICrimeData_dataframe[!rowSums(AllNICrimeData_dataframe[4] == "No Location"),]
+
+
+
 random_crime_samples <- sample_n(AllNICrimeData_dataframe_new, 1000)
+
 head(random_crime_samples)
+
 str(random_crime_sample)
 
+random_crime_samples$Location <- toupper(random_crime_samples$Location)
 
+random_crime_samples$Location <- trimws(random_crime_samples$Location)
 
 head(random_crime_samples)
 
+
+# Creating CleanDataPosrcode Dataframe
+
+cleanNiPostCodedf <- read.csv("CleanNIPostcodeData.csv", header = TRUE)
+
+cleanNiPostCodedf$Primary.Thorfare <- trimws(cleanNiPostCodedf$Primary.Thorfare)
+
+head(AllNICrimeData_dataframe)
+
+# Function to fetch Postcodes 
+
+fetchAPostcode <- function(input){
+  clean <- cleanNiPostCodedf[cleanNiPostCodedf$Primary.Thorfare == input, "Postcode"]
+  clean <- na.omit(clean)
+  uni <- unique(clean)
+  uni[which.max(tabulate(match(clean, uni)))]
+  
+}
+
+str(random_crime_samples)
+
+
+fetchAPostcode("MEADOWVALE")
+
+random_crime_samples$Postcode <- Vectorize(fetchAPostcode)(random_crime_samples$Location)
+
+head(random_crime_samples, 5)
+
+str(random_crime_samples)
+
+head(updated_random_sample)
+
+# 6) Removing Casulaty Type column and creating new daraframe. 
+# Then the dtaframe is sorted first by Postocodes and then crime type. 
+
+updated_random_sample <- random_crime_samples[, -6]
+
+head(updated_random_sample, 5)
+
+class(updated_random_sample)
+
+install.packages("gtools")
+
+library(gtools)
+
+chart_data <- updated_random_sample
+
+chart_data$Postcode<- mixedsort(chart_data$Postcode)
+
+head(chart_data, 5)  
+
+chart_data$Crime.type <- sort(chart_data$Crime.type)
+
+head(chart_data, 5)  
+
+
+# 7) Creating Bar Graph
+
+bar <- table(chart_data$Crime.type)  
+
+print(bar)
+
+counts <- table(mtcars$vs, mtcars$gear)
+
+barplot(bar, main="Crime Rate Analysis",
+        xlab="Types of Crime", col=c("darkblue","red"), cex.names = 0.4)
 
 
